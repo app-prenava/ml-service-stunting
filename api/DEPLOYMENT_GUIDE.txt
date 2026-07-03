@@ -1,0 +1,56 @@
+=========================================================
+PANDUAN DEPLOYMENT ML API KE VPS & INTEGRASI LARAVEL
+=========================================================
+
+Dokumen ini menjelaskan langkah-langkah untuk menjalankan 
+Machine Learning API di server VPS (Ubuntu/Debian) dan 
+menghubungkannya ke Backend Laravel.
+
+---------------------------------------------------------
+TAHAP 1: DEPLOYMENT ML API DI VPS MENGGUNAKAN DOCKER
+---------------------------------------------------------
+1. Pastikan server VPS Anda sudah terinstall Docker dan Docker Compose.
+2. Pindahkan seluruh folder "api" (yang berisi app.py, Dockerfile, docker-compose.yml, dan folder models) ke VPS Anda.
+3. Masuk ke dalam folder "api" melalui terminal VPS:
+   $ cd /path/ke/folder/api
+
+4. Jalankan perintah Docker Compose untuk mem-build dan menjalankan container di background (mode detached):
+   $ docker-compose up -d --build
+
+5. Pastikan API berjalan dengan baik dengan mengecek statusnya:
+   $ docker-compose ps
+   $ docker-compose logs -f
+
+6. Tes Endpoint Health-Check menggunakan Curl di VPS:
+   $ curl http://localhost:5000/health
+   (Harusnya mengembalikan respons: {"status": "healthy"})
+
+
+---------------------------------------------------------
+TAHAP 2: KONFIGURASI BACKEND LARAVEL
+---------------------------------------------------------
+1. Buka file `.env` di proyek Laravel Backend Anda.
+2. Tambahkan variabel environment baru untuk menyimpan URL ML API.
+   Jika Laravel dan ML API berada di server VPS yang sama, gunakan localhost:
+   
+   ML_API_URL="http://127.0.0.1:5000/predict"
+   
+   (Jika ML API ada di server VPS berbeda, ganti 127.0.0.1 dengan IP Publik server ML tersebut).
+
+3. Buka file Controller: `app/Http/Controllers/StuntingPredictionController.php`
+4. Ubah baris ini:
+   private $mlApiUrl = 'http://127.0.0.1:5000/predict';
+   
+   Menjadi:
+   private $mlApiUrl = env('ML_API_URL', 'http://127.0.0.1:5000/predict');
+
+5. (Opsional) Jika Laravel Backend Anda juga menggunakan Docker di server yang sama,
+   pastikan Laravel berada di "network" Docker yang sama dengan ML API.
+   Lalu gunakan nama container sebagai host, contohnya:
+   ML_API_URL="http://prenava-ml-api:5000/predict"
+
+---------------------------------------------------------
+SELESAI!
+Semua sistem siap untuk digunakan. Frontend cukup melakukan 
+POST request ke endpoint Laravel `/api/stunting/predict`.
+=========================================================

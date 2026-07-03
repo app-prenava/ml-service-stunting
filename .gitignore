@@ -1,0 +1,35 @@
+# AI Agent Configurations
+.agents/
+.gemini/
+
+# Python & Jupyter Notebooks
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Data (Ignore large raw data, but keep processed data if needed)
+data/input/
+data/interim/
+# data/processed/  <-- Buka komentar ini jika tidak ingin push CSV ke Git
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Flask API
+api/__pycache__/
+api/venv/
