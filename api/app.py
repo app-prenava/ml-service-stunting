@@ -12,10 +12,11 @@ try:
     model = joblib.load(os.path.join(MODEL_DIR, "stunting_model.pkl"))
     feature_columns = joblib.load(os.path.join(MODEL_DIR, "feature_columns.pkl"))
     threshold = joblib.load(os.path.join(MODEL_DIR, "stunting_threshold.pkl"))
+    scaler = joblib.load(os.path.join(MODEL_DIR, "stunting_scaler.pkl"))
     print("Model loaded successfully.")
 except Exception as e:
     print(f"Error loading models: {e}")
-    model, feature_columns, threshold = None, None, 0.5
+    model, feature_columns, threshold, scaler = None, None, 0.5, None
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -64,8 +65,11 @@ def predict():
         # Reorder to match model
         df = df[feature_columns]
         
+        # Scale data
+        df_scaled = scaler.transform(df)
+        
         # Predict probability
-        prob = model.predict_proba(df)[0, 1]
+        prob = model.predict_proba(df_scaled)[0, 1]
         
         # Apply optimal threshold
         pred_class = 1 if prob >= threshold else 0
